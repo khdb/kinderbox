@@ -1,0 +1,31 @@
+import sys, os
+
+rfid_management_file = "/home/pi/huy-projects/kinderbox/playground/preprocess-album/rfid-management/RFID.management"
+
+def getIdleRFID():
+	idfile = os.path.join(path, 'barcode.id')
+	if not os.path.exists(idfile):
+		return False
+	return True
+
+def main(argv):
+	path = "."
+   	if len(argv) > 0:
+      		path = argv[0]
+
+	if not os.path.exists(path) and not os.path.isdir(path):
+     		print "expecting path!"
+      		return   
+
+	idfile = os.path.join(path, 'barcode.id'
+	if not os.path.exists(idfile):
+		print "Missing Barcode.id file"
+		return
+	barcode_id = str(open(idfile).read()).strip()
+	
+		
+
+
+if __name__ == "__main__":
+	main(sys.argv[1:])
+
