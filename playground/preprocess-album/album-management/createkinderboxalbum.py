@@ -29,6 +29,10 @@ def main(argv):
    	cmd = 'python createalbumid.py "%s"' % (path)
    	print cmd
 	os.system(cmd)
+	
+	cmd = 'python createalbumrfid.py "%s"' % (path)
+	print cmd
+	os.system(cmd)
 
    	print "done."
    
