@@ -1,3 +1,3 @@
 #!/bin/bash
-find . -type d -maxdepth 1 -mindepth 1 -exec createKinderBoxAlbum.py {} \;
+find /var/lib/mpd/music  -type d -maxdepth 1 -mindepth 1 -exec python createkinderboxalbum.py {} \;
 

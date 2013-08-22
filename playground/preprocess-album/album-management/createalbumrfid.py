@@ -39,27 +39,20 @@ def save_rfid_file(rfid_path, rfid):
 
 def update_barcode_desc(rfid_map, rfid, barcode, description):
 	for index, item in enumerate(rfid_map):
-		#print index
-		#print item
 		if (item[0] == rfid):
-			print "ITEM -----"
-			#item[1] = barcode
-			#item[2] = description
                         rfid_map[index] = rfid, barcode, description
 			save_rfid_management(rfid_map)		
-			#return
+			return
 	print "Error: Have problem when update RFID Management... Check rfid = %s" % rfid
 
 def save_rfid_management(rfid_map):
 	print "Save RFID Management: "
-	print rfid_map
 	f = open(rfid_management_file, 'w')
     	for (rfid, barcode, description) in rfid_map:
 		if (barcode is None):
 			entry = "%s\n" % rfid
 		else:
 	        	entry = "%s=%s=%s\n" % (rfid, barcode, description)
-		print "Entry = %s" % entry
         	f.write(entry)
     	f.close()
 
@@ -86,6 +79,7 @@ def main(argv):
 		rfid = get_new_rfid(rfid_map)
 		if rfid is None:
 			print "Error: Not enough free RFID. Please import new RIFD..."
+			return
 		else:
 			save_rfid_file(rfid_file, rfid)
 	else:

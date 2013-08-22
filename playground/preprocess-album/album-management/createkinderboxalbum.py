@@ -13,7 +13,6 @@ def main(argv):
 	path = "."
 	if len(argv) > 0:
       		path = argv[0]
-	#path = "/var/lib/mpd/music/test"
    	if not os.path.exists(path) and not os.path.isdir(path):
       		print "expecting path!"
       		return   
@@ -22,19 +21,29 @@ def main(argv):
       		print "skipping empty folder (no media files) ... "
       		return   
  
-  	cmd = 'python createalbuminfo.py "%s"' % (path)
+
+	print "\n\n========================================================================\n"
+	print "Album: %s" % path
+	print "Create album info"
+
+	cmd = 'python createalbuminfo.py "%s"' % (path)
    	print cmd
    	os.system(cmd)
+	
+	print "\n----------------------------------------------------------------------------"
+	print "Create album barcode id"
 
    	cmd = 'python createalbumid.py "%s"' % (path)
    	print cmd
 	os.system(cmd)
 	
+	print "\n----------------------------------------------------------------------------"
+	print "Create album rfid"
 	cmd = 'python createalbumrfid.py "%s"' % (path)
 	print cmd
 	os.system(cmd)
 
-   	print "done."
+   	print "Finish an album."
    
 if __name__ == "__main__":
     main(sys.argv[1:])

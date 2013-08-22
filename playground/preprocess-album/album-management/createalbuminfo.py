@@ -27,7 +27,6 @@ def hasMediaFiles(path):
    return False
 
 def getMp3Info(fname):
-   print "Test fname = %s" % (fname)
    audiofile = eyed3.load(fname)
 
    track_str = ""
@@ -40,15 +39,14 @@ def getMp3Info(fname):
 
    mp3info = {}
    mp3info["album"] = getDataString(audiofile.tag.album)
-   #print "mp3info_album = %s" & (mp3info["album"])
    mp3info["artist"] = getDataString(audiofile.tag.artist)
    mp3info["title"] = getDataString(audiofile.tag.title)
    mp3info["genre"] = getDataString(str(audiofile.tag.genre.name))
    mp3info["year"] = getDataString(str(audiofile.tag.recording_date))
    mp3info["track"] = track_str
    #mp3info["track"] = getDataString(str(audiofile.tag.track_num)) 
-   mp3info["length"] = 10000
-   mp3info["lengthstring"] = "10000"
+   mp3info["length"] = 0
+   mp3info["lengthstring"] = "0"
    #mp3info["length"] = audiofile.play_time
    #mp3info["lengthstring"] = audiofile.playTimeString
    return mp3info
@@ -84,7 +82,6 @@ def main(argv):
             counter = counter + 1
             fullname = os.path.join(path, filename)            
             mInfo = getMp3Info(fullname)
-	    print mInfo
             # take common data from first mp3 file
             if counter == 1:
                	#print "mInfo album = %" % (mInfo["album"])
@@ -95,17 +92,16 @@ def main(argv):
             playtime = playtime + mInfo["length"]
             mp3infos.append(mInfo)
    else:
-      print "PATH?"
+      print "Missing path"
    allinfo["tracks"] = mp3infos
    allinfo["length"] = playtime
    allinfo["lengthstring"] = secondsToHMS(playtime)
-   #print allinfo
    jsonstring = json.dumps(allinfo, sort_keys=True, indent=4 * ' ')
    print "writing info.json ..."
    outputfile = open(outputname,'w')
    outputfile.write(jsonstring)
    outputfile.close()
-   print "done."
+   print "writing done."
 
 if __name__ == "__main__":
     main(sys.argv[1:])

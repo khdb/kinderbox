@@ -33,21 +33,21 @@ def main(argv):
    
    	home = expanduser("~")
    	tmp_folder = os.path.join(home, tmp_folder_name)
-   	print "checking tmp folder ..."
-   	print tmp_folder
+   	#print "checking tmp folder ..."
+   	#print tmp_folder
    	if not os.path.exists(tmp_folder):
       		print "creating tmp folder ..."
       		os.makedirs(tmp_folder)
-   	print "clearing tmp folder ..."
+   	#print "clearing tmp folder ..."
    	cmd = "rm -rf %s" % (os.path.join(tmp_folder, '*'))
    	os.system(cmd)
    	ps_file  = os.path.join(tmp_folder, 'barcode.ps') 
    	id_file  = os.path.join(path, 'barcode.id')
    	png_file = os.path.join(path, 'barcode.png')
    
-  	print ps_file
-   	print id_file
-   	print png_file
+  	#print ps_file
+   	#print id_file
+   	#print png_file
 
 
    	if os.path.exists(id_file):
@@ -62,7 +62,7 @@ def main(argv):
    
    	if not os.path.exists(png_file):
       		cmd = 'barcode -b "%s" -e ean13 -o "%s"' % (id_string, ps_file)
-      		print "executing '%s' ..." % cmd     
+      		#print "executing '%s' ..." % cmd     
       		os.system(cmd)
       		#cmd = 'convert -density 300 -crop 520x400+0+2900 "%s" "%s"' % (ps_file, png_file)
       		#print "executing '%s' ..." % cmd
@@ -70,7 +70,7 @@ def main(argv):
    	else:
       		print "skipping (barcode.png exists) ..."
 
-   	print "done."
+   	print "creating id done."
    
 if __name__ == "__main__":
     	main(sys.argv[1:])
