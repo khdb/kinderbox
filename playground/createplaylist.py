@@ -4,15 +4,10 @@ import time
 from os.path import expanduser
 
 
-#music_dir = "/data/temp/mpd_test"
-#music_dir = "/data/hdo/kinder"
 music_dir = "/var/lib/mpd/music"
 playlist_dir = "/var/lib/mpd/playlists"
-#playlist_dir = "/data/temp/mpd_test/_jukeboxpls"
 rfid_map_file = "/home/pi/huy-projects/kinderbox/playground/rfidmap.properties"
-#temp_dir = "/data/temp/mpd_test"
 temp_dir = "/home/pi/temp"
-#temp_dir = "/home/huy/pi/temp"
 
 
 def hasMediaFiles(path):
@@ -26,7 +21,7 @@ def new_id():
     time.sleep(0.02)
     ret = str(time.time()).replace('.','')
     if len(ret) < 12:
-      ret = ret + '0'    
+      ret = ret + '0'
     return ret
 
 
@@ -41,17 +36,15 @@ def getFolderListRecursive(path):
             new_path = os.path.join(current_f, element)
             flist.append()
 
-      
 def save_playlist(playlist, barcodeid):
    if len(playlist) > 0 and len(barcodeid) > 0:
-      print "saving playlist with %d entries" % len(playlist)     
+      print "saving playlist with %d entries" % len(playlist)
       fname = os.path.join(playlist_dir, "%s.m3u" % barcodeid)
       output = open(fname,'w')
       for item in playlist:
          output.write(item)
          output.write("\n")
       output.close()
-   
 
 def getRFIDs(rfidfile):
     rfidlist = []
@@ -65,16 +58,10 @@ def getRFIDs(rfidfile):
 
 def createRFIDMap(rfid_work_map):
     rfid_map = []
-    print "##Create RFIDMap"
-    #print "barcodeid = %s" % (barcodeid)
-
     for (barcodeid, rfidfile) in rfid_work_map:
-	print 1
         rfidlist = getRFIDs(rfidfile)
         for rfid in rfidlist:
-	    print 2
             rfid_map.append((rfid, barcodeid))
-    print 3
     return rfid_map
 
 
@@ -87,7 +74,6 @@ def saveRFIDMap(rfid_map):
     f.close()
 
 def load_rfid_map(rfid_map_file):
-    print "loading %s" % rfid_map_file
     rfid_map = []
     for line in open(rfid_map_file, 'r'):
         data = line.strip()
@@ -113,26 +99,24 @@ def main(argv):
 
     f = open(allsongs_file)
     for line in f:
-        line = line.strip()      
+        line = line.strip()
         dname = os.path.dirname(line)
-        if not dname == last_dirname:                         
+        if not dname == last_dirname:
             save_playlist(current_playlist, current_id)
             rfid_work_map.append((current_id, rfidfile))
             current_playlist = []
-         
-            print "preparing new playlist"
+
+            print "preparing new playlist: %s" % dname
             path = os.path.join(music_dir, dname)
             idfile = os.path.join(path, 'barcode.id')
             rfidfile = os.path.join(path, 'rfid.id')
-            print idfile
             if not os.path.exists(idfile):
                 print "ERROR: missing bardcode.id file in %s" % path
                 continue
             else:
                 current_id = str(open(idfile).read()).strip()
-        else:
-            print os.path.dirname(line)
-         
+        #else:
+            #print os.path.dirname(line)
         current_playlist.append(line)
         last_dirname = dname
     # save last open playlist
@@ -142,9 +126,7 @@ def main(argv):
     print "preparing rfid mapping ..."
     rfid_map = createRFIDMap(rfid_work_map)
     saveRFIDMap(rfid_map)
-    for item in load_rfid_map(rfid_map_file):
-        print item
-    print "done."
-   
+    print "Create playlist done."
+
 if __name__ == "__main__":
     main(sys.argv[1:])

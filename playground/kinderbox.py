@@ -5,6 +5,15 @@ import time
 import string
 import subprocess
 import re
+import RPi.GPIO as GPIO ## Import GPIO library
+
+GPIO.setmode(GPIO.BCM) ## Use board pin numbering
+GPIO.setup(17, GPIO.IN)
+GPIO.setup(18, GPIO.IN)
+GPIO.setup(4, GPIO.IN)
+GPIO.setup(22, GPIO.IN)
+GPIO.setup(23, GPIO.IN)
+
 
 
 class Kinderbox4Kids:
@@ -42,9 +51,9 @@ class Kinderbox4Kids:
                     self.rfid_map.append((rfid, barcode))
 
     def get_barcode_by_rfid(self, rfid):
-				for (rf,bc) in self.rfid_map:
-						if rfid == rf:
-        				return bc
+        for (rf,bc) in self.rfid_map:
+            if rfid == rf:
+                return bc
         return
 
     def load_playlist(self, pls):
@@ -62,6 +71,32 @@ class Kinderbox4Kids:
         else:
             print "playlist not found!"
 
+    def get_play_status(self):
+        process = subprocess.Popen(['mpc'], shell=True, stdout=subprocess.PIPE)
+        (st, er) = process.communicate()
+        self.track_count = 0
+        self.current_track = 0
+        self.play_status = 0
+
+        try:
+            found = re.findall('\[(.*?)\]', st)
+            if len(found) > 0:
+                if found[0] == 'paused':
+                    self.play_status = 1
+                else:
+                    # playing
+                    self.play_status = 2
+            found = re.findall('#(.*?)/', st)
+            if len(found) > 0:
+                self.current_track = int(found[0].strip())
+                #print "current_track = %d" % self.current_track
+            found = re.findall('#.*/(.*?)\s\s', st)
+            if len(found) > 0:
+                self.track_count = int(found[0].strip())
+                #print "track count = %d" % self.track_count
+        except ValueError, ex:
+            print '"%s" cannot be converted to an int: %s' % (found[0], ex)
+
     def get_track_count(self):
         process = subprocess.Popen(['mpc playlist | wc -l'], shell=True, stdout=subprocess.PIPE)
         (st, er) = process.communicate()
@@ -73,30 +108,30 @@ class Kinderbox4Kids:
         return tcount
 
     def char_to_hex(self, cdata):
-    		return {
-        	'0': 0x00,
-	        '1': 0x01,
-        	'2': 0x02,
-	        '3': 0x03,
-					'4': 0x04,
-          '5': 0x05,
-          '6': 0x06,
-          '7': 0x07,
-          '8': 0x08,
-          '9': 0x09,
-          'A': 0x0A,
-          'B': 0x0B,
-          'C': 0x0C,
-          'D': 0x0D,
-          'E': 0x0E,
-          'F': 0x0F,
-          'a': 0x0A,
-          'b': 0x0B,
-          'c': 0x0C,
-          'd': 0x0D,
-          'e': 0x0E,
-          'f': 0x0F,
-				}[cdata]
+        return {
+            '0': 0x00,
+            '1': 0x01,
+            '2': 0x02,
+            '3': 0x03,
+            '4': 0x04,
+            '5': 0x05,
+            '6': 0x06,
+            '7': 0x07,
+            '8': 0x08,
+            '9': 0x09,
+            'A': 0x0A,
+            'B': 0x0B,
+            'C': 0x0C,
+            'D': 0x0D,
+            'E': 0x0E,
+            'F': 0x0F,
+            'a': 0x0A,
+            'b': 0x0B,
+            'c': 0x0C,
+            'd': 0x0D,
+            'e': 0x0E,
+            'f': 0x0F,
+            }[cdata]
 
     def tag_to_dec(self, rawData):
         rfid = 0
@@ -108,45 +143,118 @@ class Kinderbox4Kids:
                                 rfid = rfid << 4
         return rfid
 
+    def process_button(self, button):
+        #if self.track_count == 0:
+        #    self.track_count = self.get_track_count()
+        #    if self.track_count > 0:
+        #        self.current_track = 1
+
+        # TOGGLE
+        #if button == '0':
+        #    print "on/off"
+        #    if not self.is_sleep_mode:
+        #        self.go_sleep()
+        #    else:
+        #        self.go_wakeup()
+
+        # ignore other buttons if in sleep mode
+        #if self.is_sleep_mode:
+        #    return
+
+        # PREV
+        if button == 'PREV':
+            if self.current_track > 1:
+                self.current_track = self.current_track - 1
+                os.system("mpc play %d " % self.current_track)
+            else:
+                print "Current track is minumum"
+
+        # PLAY/PAUSE
+        if button == 'TOGGLE':
+            os.system("mpc toggle")
+
+        #NEXT
+        if button == 'NEXT':
+            if self.current_track < self.track_count:
+                self.current_track = self.current_track + 1
+                os.system("mpc play %d " % self.current_track)
+            else:
+                print "Current track is minumum"
+
+        #VOLUME UP
+        if button == "VOLUP":
+            os.system("mpc volume +5")
+
+        #VOLUME DOWN
+        if button == "VOLDOWN":
+            os.system("mpc volume -5")
 
     def run(self):
         self.load_rfid_map()
-				print self.rfid_map
         print "connect to serial ..."       
-        ser = serial.Serial('/dev/ttyAMA0', 9600, timeout=1)
+        ser = serial.Serial('/dev/ttyAMA0', 9600, timeout=0.1)
         print("connected")
-				ser.open()
-				ser.write("testing")
-				print "Huy Testing"
-	  try:
-				while 1:
-				parse_data = False
-				rawData = []
-				decimalData = ""
-				isRead = False
-				buf = ser.read(100)
-				if len(buf) > 0:
-				for d in buf:
-					if d == '\x02':
-						rawData = []
-						isRead = True
-					elif d == '\x03':
-						isRead = False
-						break
-					else:
-						if isRead:
-							rawData.append(d)
-				if len(rawData) > 0:
-					decimalData = self.tag_to_dec(rawData)
-					print "RFID Reading = %s" % decimalData
-					barcode = self.get_barcode_by_rfid(str(decimalData))
-					if barcode is None:
-						print "Album not existed..."
-					else:
-						self.load_playlist(barcode)
-			
-		except KeyboardInterrupt:
-		ser.close()
+        ser.open()
+        ser.write("testing")
+        current_barcode = ""
+        print "Huy Testing"
+        prev_input = None
+        last_ms = time.time()
+        try:
+            while 1:
+                #Read button state
+                input =  None
+                if(GPIO.input(17)):
+                    input = "PREV"
+                if(GPIO.input(18)):
+                    input = "NEXT"
+                if(GPIO.input(4)):
+                    input = "VOLUP"
+                if(GPIO.input(22)):
+                    input = "VOLDOWN"
+                if(GPIO.input(23)):
+                    input = "TOGGLE"
+                if ((not prev_input) and input):
+                    print "input %s" % input
+                    self.process_button(input)
+                prev_input = input
+                #Read rfid card
+                parse_data = False
+                rawData = []
+                decimalData = ""
+                isRead = False
+                buf = ser.read(100)
+                if len(buf) > 0:
+                    for d in buf:
+                        if d == '\x02':
+                            rawData = []
+                            isRead = True
+                        elif d == '\x03':
+                            isRead = False
+                            break
+                        else:
+                            if isRead:
+                                rawData.append(d)
+                    if len(rawData) > 0:
+                        decimalData = self.tag_to_dec(rawData)
+                        print "RFID Reading = %s" % decimalData
+                        barcode = self.get_barcode_by_rfid(str(decimalData))
+                        if barcode is None:
+                            print "Album not existed..."
+                        else:
+                            if current_barcode != barcode:
+                                current_barcode = barcode
+                                self.load_playlist(barcode)
+                time.sleep(0.1)
+                current_ms = time.time()
+
+                #Update display each  0.5ms:
+                if (current_ms - last_ms) > 2:
+                    last_ms = current_ms
+                    self.get_play_status()
+        except KeyboardInterrupt:
+            ser.close()
+        ser.close()
 
 
 Kinderbox4Kids().run()
