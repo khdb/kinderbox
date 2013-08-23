@@ -2,12 +2,13 @@
 import os, sys, getopt
 import time
 from os.path import expanduser
+import config
 
 
-music_dir = "/var/lib/mpd/music"
-playlist_dir = "/var/lib/mpd/playlists"
-rfid_map_file = "/home/pi/huy-projects/kinderbox/playground/rfidmap.properties"
-temp_dir = "/home/pi/temp"
+music_dir = config.music_dir 
+playlist_dir = config.playlist_dir
+rfid_map_file = config.rfid_map_file
+temp_dir = config.temp_dir
 
 
 def hasMediaFiles(path):
