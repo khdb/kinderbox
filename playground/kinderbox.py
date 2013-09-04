@@ -6,21 +6,28 @@ import string
 import subprocess
 import re
 import RPi.GPIO as GPIO ## Import GPIO library
+import config
+
+PREV = config.PREV
+NEXT = config.NEXT
+VOLUP = config.VOLUP
+VOLDOWN = config.VOLDOWN
+TOGGLE = config.TOGGLE
 
 GPIO.setmode(GPIO.BCM) ## Use board pin numbering
-GPIO.setup(17, GPIO.IN)
-GPIO.setup(18, GPIO.IN)
-GPIO.setup(4, GPIO.IN)
-GPIO.setup(22, GPIO.IN)
-GPIO.setup(23, GPIO.IN)
+GPIO.setup(PREV, GPIO.IN)
+GPIO.setup(NEXT, GPIO.IN)
+GPIO.setup(VOLUP, GPIO.IN)
+GPIO.setup(VOLDOWN, GPIO.IN)
+GPIO.setup(TOGGLE, GPIO.IN)
 
 
 
 class Kinderbox4Kids:
 
     def __init__(self):
-        self.playlist_dir = "/var/lib/mpd/playlists"
-        self.rfid_map_file = "/home/pi/huy-projects/kinderbox/playground/rfidmap.properties"
+        self.playlist_dir =  config.playlist_dir
+        self.rfid_map_file = config.rfid_map_file
         self.track_count = 0
         self.current_track = 1
         self.play_status = 0
@@ -204,18 +211,17 @@ class Kinderbox4Kids:
             while 1:
                 #Read button state
                 input =  None
-                if(GPIO.input(17)):
+                if(GPIO.input(PREV)):
                     input = "PREV"
-                if(GPIO.input(18)):
+                if(GPIO.input(NEXT)):
                     input = "NEXT"
-                if(GPIO.input(4)):
+                if(GPIO.input(VOLUP)):
                     input = "VOLUP"
-                if(GPIO.input(22)):
+                if(GPIO.input(VOLDOWN)):
                     input = "VOLDOWN"
-                if(GPIO.input(23)):
+                if(GPIO.input(TOGGLE)):
                     input = "TOGGLE"
                 if ((not prev_input) and input):
-                    print "input %s" % input
                     self.process_button(input)
                 prev_input = input
                 #Read rfid card
