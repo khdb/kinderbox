@@ -5,6 +5,7 @@ import RPi.GPIO as GPIO ## Import GPIO library
 import config
 import SensorModule
 import PlayerModule
+import LCDModule
 
 PREV = config.PREV
 NEXT = config.NEXT
@@ -30,6 +31,7 @@ class Kinderbox4Kids:
 
         self.sensor = SensorModule.Sensor()
         self.player = PlayerModule.Player()
+        self.lcd = LCDModule.LCD()
 
         self.logger = logging.getLogger('kinderbox')
         hdlr = logging.FileHandler('/var/log/kinderbox/kinderbox.log')
@@ -62,11 +64,10 @@ class Kinderbox4Kids:
 
     def run(self):
         self.load_rfid_map()
-        print "connect to serial ..."
         self.sensor.open()
         current_barcode = ""
-        print "Huy Testing"
         prev_input = None
+        self.lcd.hello()
         last_ms = time.time()
         try:
             while 1:
@@ -99,14 +100,17 @@ class Kinderbox4Kids:
                 #Update display each  0.5ms:
                 if (current_ms - last_ms) > 2:
                     last_ms = current_ms
-                    self.player.get_play_status()
+                    message = self.player.get_play_status()
+                    self.lcd.message(message)
         except IOError:
             self.logger.error('An error occured trying to read the file.')
         except KeyboardInterrupt:
             self.sensor.close()
+            self.lcd.turn_off()
         except Exception, err:
             self.logger.exception("An exception occured: ")
         self.sensor.close()
+        self.lcd.turn_off()
 
 def main(argv):
     kinderbox = Kinderbox4Kids()

@@ -30,15 +30,18 @@ class Player:
         self.track_count = 0
         self.current_track = 0
         self.play_status = 0
-
+        toggle = ""
+        message = ""
         try:
             found = re.findall('\[(.*?)\]', st)
             if len(found) > 0:
                 if found[0] == 'paused':
                     self.play_status = 1
+                    toggle = "PAUSED"
                 else:
                     # playing
                     self.play_status = 2
+                    toggle = "PLAYING"
             found = re.findall('#(.*?)/', st)
             if len(found) > 0:
                 self.current_track = int(found[0].strip())
@@ -47,8 +50,11 @@ class Player:
             if len(found) > 0:
                 self.track_count = int(found[0].strip())
                 #print "track count = %d" % self.track_count
+            message = "%s \n %s %s" %(toggle, self.current_track, self.track_count)
+            return message
         except ValueError, ex:
             print '"%s" cannot be converted to an int: %s' % (found[0], ex)
+        return "N/A"
 
     def get_track_count(self):
         process = subprocess.Popen(['mpc playlist | wc -l'], shell=True, stdout=subprocess.PIPE)
