@@ -38,6 +38,23 @@ __GPIO <==> LCD__
 
 
 
+My Tasks
+===========
+
+Processing cover images:
+-------------------------
+
+Need a python script to do followings:
+
+* scan all subfolders in /var/lib/mpd/music
+* for all albums found do:
+* read the barcode.id
+* create a new folder in /var/www/images/{barcode id} (mkdir -p )
+* create a symbolic link to the folder.jpg (sudo ln -s /var/lib/mpd/music/AceOfBase/Happy\ Nation\ \(1993\)/folder.jpg /var/www/images/{barcode id}/cover.jpg)
+
+
+
+
 TODO
 -----
 
@@ -45,5 +62,6 @@ TODO
 * Power management for Amplifyer and rPi
 * Moving the UI (Play/Pause, Next, Prev, Volume UP, Volume DOWN, Display)
 * Management module for adding new music album and matching with RFID codes  
+
 
 
