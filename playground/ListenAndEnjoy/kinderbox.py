@@ -6,6 +6,10 @@ import config
 import SensorModule
 import PlayerModule
 import LCDModule
+import LoggerModule
+
+sys.path.append("/home/pi/db")
+import DBModule
 
 PREV = config.PREV
 NEXT = config.NEXT
@@ -13,6 +17,7 @@ VOLUP = config.VOLUP
 VOLDOWN = config.VOLDOWN
 TOGGLE = config.TOGGLE
 
+GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM) ## Use board pin numbering
 GPIO.setup(PREV, GPIO.IN)
 GPIO.setup(NEXT, GPIO.IN)
@@ -26,49 +31,22 @@ class Kinderbox4Kids:
 
     def __init__(self):
         self.playlist_dir =  config.playlist_dir
-        self.rfid_map_file = config.rfid_map_file
-        self.rfid_map = []
 
         self.sensor = SensorModule.Sensor()
         self.player = PlayerModule.Player()
         self.lcd = LCDModule.LCD()
+        self.logger = LoggerModule.Logger()
+        self.db = DBModule.DBUtils()
 
-        self.logger = logging.getLogger('kinderbox')
-        hdlr = logging.FileHandler('/var/log/kinderbox/kinderbox.log')
-        formatter = logging.Formatter ('%(asctime)s %(levelname)s %(message)s')
-        hdlr.setFormatter(formatter)
-        self.logger.addHandler(hdlr)
-        self.logger.setLevel(logging.WARNING)
-
-    def load_rfid_map(self):
-        print "loading %s" % self.rfid_map_file
-        if not os.path.exists(self.rfid_map_file):
-            print "could not open %s" % self.rfid_map_file
-            return
-        self.rfid_map = []
-        for line in open(self.rfid_map_file, 'r'):
-            data = line.strip()
-            if len(data) > 0:
-                index = data.find('=')
-                if index > 0:
-                    rfid = data[0:index]
-                    barcode = data[index+1:]
-                    self.rfid_map.append((rfid, barcode))
-
-    def get_barcode_by_rfid(self, rfid):
-        for (rf,bc) in self.rfid_map:
-            if rfid == rf:
-                return bc
-        return
 
 
     def run(self):
-        self.load_rfid_map()
         self.sensor.open()
         current_barcode = ""
         prev_input = None
         self.lcd.hello()
-        last_ms = time.time()
+        get_status_ms = time.time()
+        display_lcd_ms = time.time()
         try:
             while 1:
                 #Read button state
@@ -89,19 +67,35 @@ class Kinderbox4Kids:
                 #Read rfid card
                 rfid = self.sensor.get_rfid_code()
                 if (rfid != None):
-                    barcode = self.get_barcode_by_rfid(rfid)
-                    if barcode != None:
-                        if current_barcode != barcode:
-                            current_barcode = barcode
-                            self.player.load_playlist(barcode)
+                    info = self.db.get_item_by_rfid(rfid)
+                    if info is not None:
+                        barcode = info[1]
+                        album = info[2]
+                        if barcode != None:
+                            if current_barcode != barcode:
+                                current_barcode = barcode
+                                self.player.set_album(album)
+                                self.player.load_playlist(barcode)
                 time.sleep(0.1)
                 current_ms = time.time()
 
                 #Update display each  0.5ms:
-                if (current_ms - last_ms) > 2:
-                    last_ms = current_ms
-                    message = self.player.get_play_status()
-                    self.lcd.message(message)
+                if (current_ms - get_status_ms) > 2:
+                    get_status_ms = current_ms
+                    info = self.player.get_play_status()
+                    #Pause
+                    if info[0] == 1:
+                        self.lcd.display_pause()
+                    #Playing
+                    elif info[0] == 2:
+                        self.lcd.message(info[1], info[2])
+                    #Not active
+                    else:
+                        self.lcd.display_ready()
+
+                if (current_ms - display_lcd_ms) > 1:
+                    display_lcd_ms = current_ms
+                    self.lcd.scroll_to_left()
         except IOError:
             self.logger.error('An error occured trying to read the file.')
         except KeyboardInterrupt:
@@ -118,5 +112,6 @@ def main(argv):
 
 if __name__ == "__main__":
     main(sys.argv[1:])
+
 
 

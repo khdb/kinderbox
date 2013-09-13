@@ -1,2 +1,0 @@
-JSON_CALLBACK({"data": [{"barcode": "2", "name": "test", "rfid": "8699286"}, {"barcode": "137714512109", "name": "None", "rfid": "6853105"}, {"barcode": "137714513012", "name": "None", "rfid": "5202766"}]}
-)

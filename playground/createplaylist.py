@@ -3,12 +3,14 @@ import os, sys, getopt
 import time
 from os.path import expanduser
 import config
+import DBModule
 
 
 music_dir = config.music_dir 
 playlist_dir = config.playlist_dir
 rfid_map_file = config.rfid_map_file
 temp_dir = config.temp_dir
+db = DBModule.DBUtils()
 
 
 def hasMediaFiles(path):
@@ -57,34 +59,6 @@ def getRFIDs(rfidfile):
     return rfidlist
 
 
-def createRFIDMap(rfid_work_map):
-    rfid_map = []
-    for (barcodeid, rfidfile) in rfid_work_map:
-        rfidlist = getRFIDs(rfidfile)
-        for rfid in rfidlist:
-            rfid_map.append((rfid, barcodeid))
-    return rfid_map
-
-
-def saveRFIDMap(rfid_map):
-    print "saving %s with %d entries" % (rfid_map_file, len(rfid_map))
-    f = open(rfid_map_file, 'w')
-    for (rfid, barcode) in rfid_map:
-        entry = "%s=%s\n" % (rfid, barcode)
-        f.write(entry)
-    f.close()
-
-def load_rfid_map(rfid_map_file):
-    rfid_map = []
-    for line in open(rfid_map_file, 'r'):
-        data = line.strip()
-        if len(data) > 0:
-            index = data.find('=')
-            if index > 0:
-                rfid = data[0:index]
-                barcode = data[index+1:]
-                rfid_map.append((rfid, barcode))
-    return rfid_map
 
 def main(argv):
     allsongs_file = os.path.join(temp_dir, 'all.txt')
@@ -96,15 +70,12 @@ def main(argv):
     current_id = ""
     last_dirname = ""
     rfidfile = ""
-    rfid_work_map = []
-
     f = open(allsongs_file)
     for line in f:
         line = line.strip()
         dname = os.path.dirname(line)
         if not dname == last_dirname:
             save_playlist(current_playlist, current_id)
-            rfid_work_map.append((current_id, rfidfile))
             current_playlist = []
 
             print "preparing new playlist: %s" % dname
@@ -122,12 +93,6 @@ def main(argv):
         last_dirname = dname
     # save last open playlist
     save_playlist(current_playlist, current_id)
-    rfid_work_map.append((current_id, rfidfile))
-
-    print "preparing rfid mapping ..."
-    rfid_map = createRFIDMap(rfid_work_map)
-    saveRFIDMap(rfid_map)
-    print "Create playlist done."
 
 if __name__ == "__main__":
     main(sys.argv[1:])

@@ -1,41 +1,18 @@
 import os, sys
 import serial
+sys.path.append("/home/pi/db")
+import DBModule
 
-rfid_management_file = "/home/pi/huy-projects/kinderbox/playground/preprocess-album/rfid-management/RFID.management"
+db = DBModule.DBUtils()
 
-def loadRFID():
-	rfid_map = []
-	if not os.path.exists(rfid_management_file):
-		return rfid_map
-    	for line in open(rfid_management_file, 'r'):
-        	data = line.strip()
-        	if len(data) > 0:
-            		index = data.find('=')
-            		if index > 0:
-                		rfid = data[0:index]
-                		desc = data
-                		rfid_map.append((rfid, desc))
-			else:
-				rfid = data
-				desc = None
-				rfid_map.append((rfid, desc))
-    	return rfid_map
 
-def saveRFID(rfid, rfid_map):
-	if checkRFIDExisted(rfid, rfid_map):
-		print "Not save! RFID = %s is existed!" % rfid
-	else:
-		print "Saving RFID = %s..." % rfid 
-		with open(rfid_management_file, "a") as myfile:
-			entry = "%s\n" % (rfid)
-			myfile.write(entry)
-		rfid_map.append((rfid,"Moi them vao ne"))
 
-def checkRFIDExisted(rfid, rfid_map):
-	for (rf, desc) in rfid_map:
-		if rfid == rf:
-                	return True
-        return False
+def saveRFID(rfid):
+    if db.check_rfid_existed(rfid):
+        print "Not save! RFID = %s is existed!" % rfid
+    else:
+        print "Saving RFID = %s..." % rfid
+        db.insert_free_rfid(rfid)
 
 def char_to_hex(cdata):
         return {
@@ -64,47 +41,48 @@ def char_to_hex(cdata):
          }[cdata]
 
 def tag_to_dec(rawData):
-        rfid = 0
-        for idx, r in enumerate(rawData):
-                if idx >= 2 and idx <= 9:
-                        hdata = char_to_hex(r)
-                        rfid =  rfid | hdata
-                        if idx < 9:
-                                rfid = rfid << 4
-        return rfid
+    rfid = 0
+    for idx, r in enumerate(rawData):
+        if idx >= 2 and idx <= 9:
+            hdata = char_to_hex(r)
+            rfid =  rfid | hdata
+            if idx < 9:
+                rfid = rfid << 4
+    return rfid
 
 
 def main(argv):
-	rfid_map = loadRFID()
-	ser = serial.Serial('/dev/ttyAMA0', 9600, timeout=1)
-	ser.open()
-	ser.write("testing")
-	print "Ready to receive RFID card:"
-	try:
-        	while 1:
-			parse_data = False
-			rawData = []
-			decimalData = ""
-			isRead = False
-			buf = ser.read(100)
-			if len(buf) > 0:
-              			for d in buf:
-					if d == '\x02':
-						rawData = []
-						isRead = True
-                        		elif d == '\x03':				
-						isRead = False
-						break
-                             		else:
-						if isRead:
-							rawData.append(d)
-			if len(rawData) > 0:
-				print "\n------------------------------------------\n"
-				decimalData = tag_to_dec(rawData)
-				print "RFID  = %s" % decimalData
-				saveRFID(str(decimalData), rfid_map)
-	except KeyboardInterrupt:
-        	ser.close()
+    ser = serial.Serial('/dev/ttyAMA0', 9600, timeout=1)
+    ser.open()
+    ser.write("testing")
+    print "Ready to receive RFID card:"
+    try:
+        while 1:
+            parse_data = False
+            rawData = []
+            decimalData = ""
+            isRead = False
+            buf = ser.read(100)
+            if len(buf) > 0:
+                for d in buf:
+                    if d == '\x02':
+                        rawData = []
+                        isRead = True
+                    elif d == '\x03':
+                        isRead = False
+                        break
+                    else:
+                        if isRead:
+                            rawData.append(d)
+            if len(rawData) > 0:
+                print "\n------------------------------------------\n"
+                decimalData = tag_to_dec(rawData)
+                print "RFID  = %s" % decimalData
+                saveRFID(str(decimalData))
+    except KeyboardInterrupt:
+        ser.close()
+    finally:
+        ser.close()
 
 if __name__ == "__main__":
-	main(sys.argv[1:])
+    main(sys.argv[1:])

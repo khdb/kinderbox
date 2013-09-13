@@ -1,95 +1,55 @@
 import sys, os
+sys.path.append("/home/pi/db")
+import DBModule
 
-rfid_management_file = "/home/pi/huy-projects/kinderbox/playground/preprocess-album/rfid-management/RFID.management"
+db = DBModule.DBUtils()
 
-def loadRFID():
-	rfid_map = []
-    	for line in open(rfid_management_file, 'r'):
-        	data = line.strip()
-        	if len(data) > 0:
-			lststr = data.split('=')
-            		if len(lststr) == 1:
-                		rfid = data
-				barcodeid = None
-				desc = None
-                		rfid_map.append((rfid, barcodeid, desc))
-			else:
-				rfid = lststr[0]
-				barcodeid = lststr[1]
-				desc = lststr[2] 
-				rfid_map.append((rfid, barcodeid, desc))
-    	return rfid_map
 
-def get_rfid_by_barcode(barcodeid, rfid_map):
-	for (rf, bc, desc) in rfid_map:
-        	if barcodeid  == bc:
-                	return rf
-        return
-
-def get_new_rfid(rfid_map):
-	for (rf, bc, desc) in rfid_map:
-		if bc is None:
-			return rf
-	return
-	
 def save_rfid_file(rfid_path, rfid):
-	with open(rfid_path, "w") as myfile:
-		entry = "%s" % (rfid)
-		myfile.write(entry)
-
-def update_barcode_desc(rfid_map, rfid, barcode, description):
-	for index, item in enumerate(rfid_map):
-		if (item[0] == rfid):
-                        rfid_map[index] = rfid, barcode, description
-			save_rfid_management(rfid_map)		
-			return
-	print "Error: Have problem when update RFID Management... Check rfid = %s" % rfid
-
-def save_rfid_management(rfid_map):
-	print "Save RFID Management: "
-	f = open(rfid_management_file, 'w')
-    	for (rfid, barcode, description) in rfid_map:
-		if (barcode is None):
-			entry = "%s\n" % rfid
-		else:
-	        	entry = "%s=%s=%s\n" % (rfid, barcode, description)
-        	f.write(entry)
-    	f.close()
+    with open(rfid_path, "w") as myfile:
+        entry = "%s" % (rfid)
+        myfile.write(entry)
 
 def main(argv):
-	path = "."
-   	if len(argv) > 0:
-      		path = argv[0]
+    path = "."
+    if len(argv) > 0:
+        path = argv[0]
 
-	if not os.path.exists(path) and not os.path.isdir(path):
-     		print "expecting path!"
-      		return   
+    if not os.path.exists(path) and not os.path.isdir(path):
+        print "expecting path!"
+        return
 
-	idfile = os.path.join(path, 'barcode.id')
-	if not os.path.exists(idfile):
-		print "Missing Barcode.id file"
-		return
-	rfid_map = loadRFID();
-	barcode_id = str(open(idfile).read()).strip()
+    name = os.path.basename(path)
+    idfile = os.path.join(path, 'barcode.id')
+    rfid_file = os.path.join(path, 'rfid.id')
+    if not os.path.exists(idfile):
+        print "Missing Barcode.id file"
+        return
 
-	rfid_file = os.path.join(path, 'rfid.id')
-	rfid = get_rfid_by_barcode(barcode_id, rfid_map)
-	if rfid is None:
-		#Get new RFID from RFID Management
-		rfid = get_new_rfid(rfid_map)
-		if rfid is None:
-			print "Error: Not enough free RFID. Please import new RIFD..."
-			return
-		else:
-			save_rfid_file(rfid_file, rfid)
-	else:
-		#Update RFID
-		save_rfid_file(rfid_file, rfid)
+    barcode_id = str(open(idfile).read()).strip()
+    item = db.get_item_by_barcodeid(barcode_id)
+    if item is None:
+        rfid = None 
+    else:
+        rfid = item[0]
 
-	#Update BarcodeID into RFID Management
-	update_barcode_desc(rfid_map, rfid, barcode_id, path)
+    if rfid is None:
+        #Get new RFID from RFID Management
+
+        rfid = db.get_free_rfid()
+        if rfid is None:
+            print "Error: Not enough free RFID. Please import new RIFD..."
+            return
+        else:
+            save_rfid_file(rfid_file, rfid)
+    else:
+        #Update RFID
+        save_rfid_file(rfid_file, rfid)
+
+    #Update BarcodeID into RFID Management
+    db.update_item_by_barcodeid(rfid, barcode_id, name)
 
 
 if __name__ == "__main__":
-	main(sys.argv[1:])
+    main(sys.argv[1:])
 

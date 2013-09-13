@@ -1,5 +1,6 @@
 import sys, os, subprocess, re
 import config
+import LoggerModule
 
 class Player:
 
@@ -9,6 +10,9 @@ class Player:
         self.track_count = 0
         self.current_track = 1
         self.play_status = 0
+        self.current_artist_title = ""
+        self.current_album = ""
+        self.logger = LoggerModule.Logger()
 
     def load_playlist(self, pls):
         pls_file = os.path.join(self.playlist_dir, "%s.m3u" % pls)
@@ -24,24 +28,27 @@ class Player:
         else:
             print "playlist not found!"
 
+    def set_album(self, album):
+        self.current_album = album
+
     def get_play_status(self):
         process = subprocess.Popen(['mpc'], shell=True, stdout=subprocess.PIPE)
         (st, er) = process.communicate()
         self.track_count = 0
         self.current_track = 0
         self.play_status = 0
-        toggle = ""
-        message = ""
+        message1 = ""
+        message2 = self.current_album
         try:
             found = re.findall('\[(.*?)\]', st)
             if len(found) > 0:
                 if found[0] == 'paused':
                     self.play_status = 1
-                    toggle = "PAUSED"
                 else:
                     # playing
                     self.play_status = 2
-                    toggle = "PLAYING"
+                #Get artist - title
+                self.current_artist_title = st.split('\n',1)[0]
             found = re.findall('#(.*?)/', st)
             if len(found) > 0:
                 self.current_track = int(found[0].strip())
@@ -50,8 +57,8 @@ class Player:
             if len(found) > 0:
                 self.track_count = int(found[0].strip())
                 #print "track count = %d" % self.track_count
-            message = "%s \n %s %s" %(toggle, self.current_track, self.track_count)
-            return message
+            message1 = "%s. %s" %(self.current_track, self.current_artist_title)
+            return [self.play_status, message1, message2]
         except ValueError, ex:
             print '"%s" cannot be converted to an int: %s' % (found[0], ex)
         return "N/A"
