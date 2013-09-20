@@ -87,7 +87,7 @@ class Kinderbox4Kids:
                 current_ms = time.time()
 
                 #Update display each  0.5ms:
-                if (current_ms - get_status_ms) > 2:
+                if (current_ms - get_status_ms) > 5:
                     get_status_ms = current_ms
                     info = self.player.get_play_status()
                     #Pause
@@ -108,6 +108,7 @@ class Kinderbox4Kids:
         except KeyboardInterrupt:
             self.sensor.close()
             self.lcd.turn_off()
+            os.system("mpc stop")
         except Exception, err:
             self.logger.exception("An exception occured: ")
         self.sensor.close()

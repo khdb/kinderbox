@@ -35,25 +35,14 @@ REPLACEMENTS =          [ '\0', '\0', '\0', '\0', '\0',
                         'O', 'o', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U',
                         'u', 'U', 'u', 'U', 'u', ];
 
-def is_utf8(s):
-    valid = True
-    try:
-        s.encode('utf-8')
-    except UnicodeDecodeError:
-        valid = False
-    finally:
-        print "Is UTF8: %s" %valid
-        return valid
 
 def remove_latin(str_input):
     str_iso = str_input.encode("ISO-8859-1")
     str_utf8 = str_iso.decode("utf-8")
-    print "str = %s" %str_utf8
 
     char_list = []
     for c in str_utf8:
         dc = ord(c)
-        print "c = %s and ord = %d" %(c,dc)
         if 97 <= dc <= 122 or 65 <= dc <= 90 or 48 <= dc <= 57 or dc in [32,38,45,46]:
             char_list.append(c)
             continue
@@ -69,15 +58,11 @@ def remove_latin(str_input):
 
 def remove_unicode(str_input):
     #unicode_name = unicode(str_input, "utf-8", errors="ignore"
-
     str_utf8 = str_input
-    print "str = %s" %str_utf8
-
     char_list = []
     unknown_char = 0
     for c in str_utf8:
         dc = ord(c)
-        print "c = %s and ord = %d" %(c,dc)
         if 97 <= dc <= 122 or 65 <= dc <= 90 or 48 <= dc <= 57 or dc in [32,38,45,46]:
             char_list.append(c)
             continue
@@ -90,19 +75,14 @@ def remove_unicode(str_input):
                     break
             if skip == False:
                unknown_char = unknown_char + 1
-               print "Lost char = %s" %c
             if (unknown_char >= 2):
                 #Oop. this is not UTF-8. Change to Latin-1 now
                 print "Oop. this is not UTF-8. Change to Latin-1 now"
-                raw_input()
                 char_list = remove_latin(str_input)
-                print char_list
                 break
 
     normal_name = ''.join(char_list)
     return normal_name
-
-
 
 
 def main(argv):

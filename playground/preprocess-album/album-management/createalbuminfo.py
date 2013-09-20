@@ -2,7 +2,6 @@
 #!/usr/bin/env python
 import os, eyed3, sys, getopt
 import simplejson as json
-import normalization
 
 def secondsToHMS(seconds):
     hours = seconds / 3600
@@ -13,8 +12,6 @@ def secondsToHMS(seconds):
         return "%02d:%02d" % (minutes, seconds)
     return "%02d:%02d:%02d" % (hours, minutes, seconds)
 
-def is_ascii(s):
-    eturn all(ord(c) < 128 for c in s)
 
 def getDataString(data):
     if not data:
@@ -22,11 +19,6 @@ def getDataString(data):
     data = data.strip()
     if len(data) == 0:
         return "unknown"
-    print "data = %s" %data
-    if is_ascii(data) == False:
-        data = normalization.remove_unicode(data)
-        print "new data = %s" %data
-    raw_input()
     return data
 
 def hasMediaFiles(path):
