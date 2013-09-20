@@ -25,7 +25,7 @@ def stop_mpc():
 def main():
     try:
         #Kill all python and mpc
-        #kill_kinderbox()
+        kill_kinderbox()
         stop_mpc()
         kill_reading_RFID()
         #Run readingRFID.py : receive new RFID from sensor

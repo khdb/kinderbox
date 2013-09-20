@@ -11,11 +11,15 @@ db = DBModule.DBUtils()
 def run():
     listItem = db.get_all_item()
     item_map = []
-    for (r, b, n) in listItem:
+    if listItem is None:
+        print json.dumps({"data": item_map})
+        return
+    for (r, b, n, cr) in listItem:
         rfid = r
         barcodeid = b
         name = n
-        d = dict(rfid = rfid, barcode = barcodeid, name = name)
+        created_date = cr 
+        d = dict(rfid = rfid, barcodeid = barcodeid, name = name, created_at = created_date)
         item_map.append(d)
     js = json.dumps({"data": item_map})
     print js
