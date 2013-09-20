@@ -22,6 +22,13 @@ def main(argv):
         return  
 
     print "\n\n========================================================================\n"
+    print "Normalization album"
+
+    cmd = 'python normalization.py "%s"' %(path)
+    print cmd
+    #os.system(cmd)
+
+    print "\n\n========================================================================\n"
     print "Album: %s" % path
     print "Create album info"
 
@@ -36,11 +43,11 @@ def main(argv):
     print cmd
     os.system(cmd)
 
-    print "\n----------------------------------------------------------------------------"
-    print "Create album rfid"
-    cmd = 'python createalbumrfid.py "%s"' % (path)
-    print cmd
-    os.system(cmd)
+    #print "\n----------------------------------------------------------------------------"
+    #print "Create album rfid"
+    #cmd = 'python createalbumrfid.py "%s"' % (path)
+    #print cmd
+    #os.system(cmd)
 
     print "\n----------------------------------------------------------------------------"
     print "Create album cover"

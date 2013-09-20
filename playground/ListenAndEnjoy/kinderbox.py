@@ -39,8 +39,14 @@ class Kinderbox4Kids:
         self.db = DBModule.DBUtils()
 
 
+    def kill_reading_rfid(self):
+        cmd = "sudo pkill -9 -f enableScanRFID.py"
+        os.system(cmd)
+        cmd = "sudo pkill -9 -f readingRFID.py"
+        os.system(cmd)
 
     def run(self):
+        self.kill_reading_rfid()
         self.sensor.open()
         current_barcode = ""
         prev_input = None
@@ -73,6 +79,7 @@ class Kinderbox4Kids:
                         album = info[2]
                         if barcode != None:
                             if current_barcode != barcode:
+                                print "barcode id = %s" %barcode
                                 current_barcode = barcode
                                 self.player.set_album(album)
                                 self.player.load_playlist(barcode)

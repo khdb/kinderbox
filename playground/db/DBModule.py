@@ -1,12 +1,17 @@
 # -*- coding: cp1252 -*-
 import sqlite3 as lite
 import sys
+from datetime import datetime
+import calendar
+
+
 
 class DBUtils:
 
 
     def __init__(self):
         self.path = "/home/pi/db/kinderbox.db"
+        #self.path = "kinderbox.db"
 
     def get_sql_lite_version(self):
         try:
@@ -26,7 +31,10 @@ class DBUtils:
         try:
             con = lite.connect(self.path)
             cur = con.cursor()
-            cur.execute("INSERT INTO item VALUES(?,?,?)", (rfid, barcodeid, name))
+
+            now = datetime.now()
+            timestamp = calendar.timegm(now.utctimetuple())
+            cur.execute("INSERT INTO item (rfid,barcodeid,name, created_date) VALUES(?,?,?,?)", (rfid, barcodeid, name, timestamp))
             con.commit()
         except lite.Error, e:
             print "Error %s:" % e.args[0]
@@ -49,6 +57,20 @@ class DBUtils:
         finally:
             if con:
                 con.close()
+
+    def delete_item_by_barcodeid(self, barcodeid):
+        try:
+            con = lite.connect(self.path)
+            cur = con.cursor()
+            cur.execute("DELETE FROM item WHERE barcodeid=?", (barcodeid,))
+            con.commit()
+        except lite.Error, e:
+            print "Error %s:" % e.args[0]
+            sys.exit(1)
+        finally:
+            if con:
+                con.close()
+
 
     def check_rfid_existed(self, rfid):
         try:
@@ -117,8 +139,8 @@ class DBUtils:
         try:
             con = lite.connect(self.path)
             cur = con.cursor()
-            cur.execute("UPDATE item SET rfid=?, name=? WHERE barcodeid=?", (rfid, name, barcodeid))
-            cur.execute("DELETE FROM free_rfid WHERE rfid=%s" %(rfid))
+            cur.execute("UPDATE item SET rfid=?, name=? WHERE barcodeid=?;", (rfid, name, barcodeid, ))
+            cur.execute("DELETE FROM free_rfid WHERE rfid=?;", (rfid, ))
             con.commit()
         except lite.Error, e:
             print "Error %s:" % e.args[0]
@@ -131,7 +153,7 @@ class DBUtils:
         try:
             con = lite.connect(self.path)
             cur = con.cursor()
-            cur.execute("SELECT * FROM item")
+            cur.execute("SELECT rfid, barcodeid, name, DATETIME(created_date, 'unixepoch') FROM item ORDER BY created_date DESC")
             rows = cur.fetchall()
             con.close()
             if (len(rows) > 0):
@@ -145,12 +167,39 @@ class DBUtils:
             if con:
                 con.close()
 
+    def get_all_rfid(self):
+        try:
+            con = lite.connect(self.path)
+            cur = con.cursor()
+            result = []
+            #Get bysy rfid
+            cur.execute("SELECT rfid FROM item WHERE rfid != null")
+            rows = cur.fetchall()
+            if (len(rows) > 0):
+                for (rfid,) in rows:
+                    d = dict(rfid=rfid,free='no')
+                    result.append(d)
+            #Get free rfid
+            cur.execute ("SELECT rfid FROM free_rfid")
+            rows = cur.fetchall()
+            if (len(rows) > 0):
+                for (rfid,) in rows:
+                    d = dict(rfid=rfid,free='yes')
+                    result.append(d)
+            return result
+        except lite.Error, e:
+            print "Error %s:" % e.args[0]
+            sys.exit(1)
+        finally:
+            if con:
+                con.close()
+
 
     def get_item_by_rfid (self, rfid):
         try:
             con = lite.connect(self.path)
             cur = con.cursor()
-            cur.execute("SELECT * FROM item WHERE rfid=?", (rfid, ))
+            cur.execute("SELECT rfid, barcodeid, name, DATETIME(created_date, 'unixepoch') FROM item WHERE rfid=?", (rfid, ))
             rows = cur.fetchall()
             con.close()
             if (len(rows) > 0):
@@ -168,7 +217,7 @@ class DBUtils:
         try:
             con = lite.connect(self.path)
             cur = con.cursor()
-            cur.execute("SELECT * FROM item WHERE barcodeid=?", (barcodeid, ))
+            cur.execute("SELECT rfid, barcodeid, name, DATETIME(created_date, 'unixepoch') FROM item WHERE barcodeid=?", (barcodeid, ))
             rows = cur.fetchall()
             con.close()
             if (len(rows) > 0):
@@ -190,7 +239,7 @@ class DBUtils:
             cur.execute("SELECT * FROM free_rfid")
             rows = cur.fetchall()
             if (len(rows) > 0):
-                return rows[0][0]
+                return rows[0]
             else:
                 return None
         except lite.Error, e:
@@ -204,10 +253,10 @@ class DBUtils:
         try:
             con = lite.connect(self.path)
             cur = con.cursor()
-            cur.execute("SELECT * FROM item WHERE rfid is null")
+            cur.execute("SELECT rfid, barcodeid, name, DATETIME(created_date, 'unixepoch') FROM item WHERE rfid is null ORDER BY created_date DESC")
             rows = cur.fetchall()
             if (len(rows) > 0):
-                return rows[0][0]
+                return rows[0]
             else:
                 return None
         except lite.Error, e:
@@ -216,4 +265,5 @@ class DBUtils:
         finally:
             if con:
                 con.close()
+
 
