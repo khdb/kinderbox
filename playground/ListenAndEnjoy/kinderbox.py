@@ -69,6 +69,10 @@ class Kinderbox4Kids:
                     input = "TOGGLE"
                 if ((not prev_input) and input):
                     self.player.process_button(input)
+                    if input == "VOLDOWN" or input == "VOLUP":
+                        message = self.player.get_volume()
+                        #self.lcd.setVolum()
+                        print "REGEX cua Huy: %s" %message
                 prev_input = input
                 #Read rfid card
                 rfid = self.sensor.get_rfid_code()
@@ -105,14 +109,13 @@ class Kinderbox4Kids:
                     self.lcd.scroll_to_left()
         except IOError:
             self.logger.error('An error occured trying to read the file.')
-        except KeyboardInterrupt:
+            os.system("mpc stop")
+        except Exception, err:
+            self.logger.exception("An exception occured: %s" %err)
+        finally:
             self.sensor.close()
             self.lcd.turn_off()
             os.system("mpc stop")
-        except Exception, err:
-            self.logger.exception("An exception occured: ")
-        self.sensor.close()
-        self.lcd.turn_off()
 
 def main(argv):
     kinderbox = Kinderbox4Kids()

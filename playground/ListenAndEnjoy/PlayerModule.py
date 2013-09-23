@@ -12,7 +12,7 @@ class Player:
         self.play_status = 0
         self.current_artist_title = ""
         self.current_album = ""
-        self.logger = LoggerModule.Logger()
+        self.logger = LoggerModule.Logger("Player module")
 
     def load_playlist(self, pls):
         pls_file = os.path.join(self.playlist_dir, "%s.m3u" % pls)
@@ -26,10 +26,23 @@ class Player:
             if self.track_count > 0:
                 os.system("mpc play 1")
         else:
-            print "playlist not found!"
+            self.logger.error("playlist not found!")
 
     def set_album(self, album):
         self.current_album = album
+
+    def get_volume(self):
+        process = subprocess.Popen(['mpc'], shell=True, stdout=subprocess.PIPE)
+        (st, er) = process.communicate()
+        try:
+            found = re.findall("volume.*%", st)
+            if len(found) > 0:
+                return found[0]
+            return "N/A"
+        except Exception, ex:
+            self.logger.error("Detect volume fail: %s" %ex)
+            return "N/A"
+
 
     def get_play_status(self):
         process = subprocess.Popen(['mpc'], shell=True, stdout=subprocess.PIPE)
@@ -60,7 +73,7 @@ class Player:
             message1 = "%s. %s" %(self.current_track, self.current_artist_title)
             return [self.play_status, message1, message2]
         except ValueError, ex:
-            print '"%s" cannot be converted to an int: %s' % (found[0], ex)
+            self.logger.error('"%s" cannot be converted to an int: %s' % (found[0], ex))
         return "N/A"
 
     def get_track_count(self):
@@ -70,7 +83,7 @@ class Player:
         try:
             tcount = int(st.strip())
         except ValueError, ex:
-            print '"%s" cannot be converted to an int: %s' % (st, ex)
+            self.logger.error('"%s" cannot be converted to an int: %s' % (st, ex))
         return tcount
 
 

@@ -12,7 +12,7 @@ class LCD:
     def __init__(self):
         self.lcd = Adafruit_CharLCD()
         self.lcd.clear()
-        self.logger = LoggerModule.Logger()
+        self.logger = LoggerModule.Logger("LCD Module")
 
     def hello(self):
         self.lcd.message("  Welcome to \n Kinderbox ")
@@ -25,6 +25,9 @@ class LCD:
 
     def display_ready(self):
         self.message("", "Ready")
+
+    def display_volume(self, message):
+        self.message("", message)
 
 
     def message(self, line1, line2):
@@ -42,7 +45,6 @@ class LCD:
         self.lcd.clear()
         sleep(0.5)
         message = "%s\n%s" %(n_line1,n_line2)
-        print "Message: %s" %(message)
         self.lcd.message(message)
         self.__line1 = line1
         self.__line2 = line2

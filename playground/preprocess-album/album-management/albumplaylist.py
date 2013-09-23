@@ -33,26 +33,18 @@ def save_playlist(playlist, barcodeid):
 
 
 
-def main(argv):
-    path = "."
-    if len(argv) > 0:
-        path = argv[0]
-
-    if not os.path.exists(path) and not os.path.isdir(path):
-        print "expecting path"
-        return
+def create(path):
 
     idfile = os.path.join(path, 'barcode.id')
     if not os.path.exists(idfile):
-        print "Missing Barcode.id file"
-        return
+        raise Exception("Missing Barcode.id file")
 
     current_id = str(open(idfile).read()).strip()
     current_playlist = []
     m3ufile = os.path.join(playlist_dir, '%s.m3u' % current_id)
     if os.path.exists(m3ufile):
-        print "Playlist existed"
-        return
+        raise Exception ("Playlist existed")
+
     os.system("mpc update")
 
     for f in glob.glob("%s/*.mp3" %path):

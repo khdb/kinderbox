@@ -8,36 +8,40 @@ archive_file  = "/var/www/cgi-bin/archive.log"
 original_folder_name = 'test'
 
 def process(filename):
-    os.system("echo %s >> upload.log" % filename)
-    #test if the archive contains mp3 files
-    os.system("echo '*********************\n' >> %s" % archive_file)
-    #os.system("tar -tzf %s/%s >> %s " % (temp_folder, filename, archive_file) )
-    #output = os.system("tar -tvf %s/%s " % (temp_folder, filename) )
-    #determine if archieve file is tar, zip or gz
-    is_mp3 = False
-    if filename.endswith('.gz') or filename.endswith('.tar'):
-        args = "tar -tzf %s/%s" % (temp_folder, filename)
-        print args
-        is_mp3 = test_tar(args)
-    if filename.endswith('.zip'):
-        # or use: zipinfo -1 archive.zip
-        args = "unzip -Z -1 '%s/%s'" % (temp_folder, filename)
-        print args
-        is_mp3 = test_zip(args)
-    
+    try:
+        os.system("echo %s >> upload.log" % filename)
+        #test if the archive contains mp3 files
+        os.system("echo '*********************\n' >> %s" % archive_file)
+        #os.system("tar -tzf %s/%s >> %s " % (temp_folder, filename, archive_file) )
+        #output = os.system("tar -tvf %s/%s " % (temp_folder, filename) )
+        #determine if archieve file is tar, zip or gz
+        is_mp3 = False
+        if filename.endswith('.gz') or filename.endswith('.tar'):
+            args = "tar -tzf %s/%s" % (temp_folder, filename)
+            print args
+            is_mp3 = test_tar(args)
+        if filename.endswith('.zip'):
+            # or use: zipinfo -1 archive.zip
+            args = "unzip -Z -1 '%s/%s'" % (temp_folder, filename)
+            print args
+            is_mp3 = test_zip(args)
 
-    if is_mp3:
-        #unzip the archieve file to /var/lib/mpd/music/
-        extract(filename)
-        #perform_mpc_update()
-        perform_create_info_album()
-        #perform_create_playlist()
-        #change_ownership(original_folder_name)
-        change_ownership() #change ownership of the entire music diretory recursively
-        return #return if everything is done.
-
-    #at this point there is an error occured!
-    print "oops, something went wrong."
+        if is_mp3:
+            #unzip the archieve file to /var/lib/mpd/music/
+            extract(filename)
+            #perform_mpc_update()
+            perform_create_info_album()
+            #perform_create_playlist()
+            #change_ownership(original_folder_name)
+            change_ownership() #change ownership of the entire music diretory recursively
+            return #return if everything is done.
+    except Exception ,ex:
+            #at this point there is an error occured!
+            print "oops, something went wrong."
+            print ex
+            sys.exit(1)
+    finally:
+            os.remove(os.path.join(temp_folder,filename))
 
 
 def test_tar(args):

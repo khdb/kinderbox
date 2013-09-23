@@ -21,18 +21,7 @@ def new_id():
         ret = ret + '0'
     return ret
 
-def main(argv):
-    path = "."
-    if len(argv) > 0:
-        path = argv[0]
-
-    if not os.path.exists(path) and not os.path.isdir(path):
-        print "expecting path!"
-        return
-
-    if not hasMediaFiles(path):
-        print "skipping empty folder (no media files) ... "
-        return
+def create(path):
 
     home = expanduser("~")
     tmp_folder = os.path.join(home, tmp_folder_name)
@@ -58,16 +47,16 @@ def main(argv):
         output = open(id_file,'w')
         output.write(id_string)
         output.close()
-    
+
     #Write album to item table
     if db.check_barcodeid_existed(id_string) == False:
         name = os.path.basename(path)
         if name == "" or name is None:
             name = os.path.basename(os.path.dirname(path))
-        db.insert_item(None, id_string, name)
 
     print "creating id done."
+    return (id_string,name)
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    create(sys.argv[1:])
 
