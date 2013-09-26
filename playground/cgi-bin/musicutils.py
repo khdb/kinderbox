@@ -1,17 +1,18 @@
 import subprocess
 import cgi, os
 import StringIO
+import LoggerModule
 
 target_folder = "/var/lib/mpd/music"
 temp_folder   = "/var/www/cgi-bin/temp"
-archive_file  = "/var/www/cgi-bin/archive.log"
+#archive_file  = "/var/www/cgi-bin/archive.log"
 original_folder_name = 'test'
 
 def process(filename):
     try:
-        os.system("echo %s >> upload.log" % filename)
+        #os.system("echo %s >> upload.log" % filename)
         #test if the archive contains mp3 files
-        os.system("echo '*********************\n' >> %s" % archive_file)
+        #os.system("echo '*********************\n' >> %s" % archive_file)
         #os.system("tar -tzf %s/%s >> %s " % (temp_folder, filename, archive_file) )
         #output = os.system("tar -tvf %s/%s " % (temp_folder, filename) )
         #determine if archieve file is tar, zip or gz
@@ -37,6 +38,8 @@ def process(filename):
             return #return if everything is done.
     except Exception ,ex:
             #at this point there is an error occured!
+            logger = LoggerModule.Logger("Music utils")
+            logger.error("%s" %ex)
             print "oops, something went wrong."
             print ex
             sys.exit(1)

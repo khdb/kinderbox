@@ -26,15 +26,14 @@ def main():
     try:
         #Kill all python and mpc
         kill_kinderbox()
-        stop_mpc()
         kill_reading_RFID()
         #Run readingRFID.py : receive new RFID from sensor
-        os.system("sudo python readingRFID.py &")
+        os.system("sudo python /home/pi/huy-projects/kinderbox/kinderbox.py &")
         print "Status: 204 NO CONTENT"
         print "Content-Type: application/json;charset=UTF-8"
         print
     except Exception, e:
-        logger = LoggerModule.Logger("Enable scan RFID")
+        logger = LoggerModule.Logger("Enable Kinderbox")
         logger.error("%s" %e)
         print "Status: 400 BAD REQUEST"
         print "Content-Type: application/json;charset=UTF-8"

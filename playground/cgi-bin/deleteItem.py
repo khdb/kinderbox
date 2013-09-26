@@ -2,6 +2,7 @@
 import cgitb, cgi
 import os, json, sys, shutil
 import config
+import LoggerModule
 sys.path.append('/home/pi/db')
 import DBModule
 cgitb.enable()
@@ -39,6 +40,8 @@ def run():
 
             js = json.dumps({"result":"success"})
     except Exception, ex:
+        logger = LoggerModule.Logger("Delete item")
+        logger.error("Error when delete item: %s" %ex)
         js = json.dumps({"result":"error: %s" %ex})
     finally:
         print js

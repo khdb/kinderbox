@@ -3,12 +3,15 @@ import cgitb
 import os, signal,sys
 import config, time
 import serial
+import LoggerModule
+import LCDModule
 sys.path.append("/home/pi/db")
 import DBModule
 
 #cgitb.enable()
 
 db = DBModule.DBUtils()
+lcd = LCDModule.LCD()
 
 def char_to_hex(cdata):
     return {
@@ -65,6 +68,7 @@ def send_notification(rfid):
 def reading_rfid():
     ser = serial.Serial('/dev/ttyAMA0',9600, timeout=1)
     ser.open()
+    lcd.message("Kinderbox stopped", "Ready to add new card")
     try:
         while 1:
             rawData = []
@@ -86,9 +90,12 @@ def reading_rfid():
                     decimalData = str(tag_to_dec(rawData))
                     print "RFID Reading = %s" % decimalData
                     add_rfid(str(decimalData))
-    except KeyboardInterrupt:
+    except Exception, ex:
+        logger = LoggerModule.Logger("Reading RFID")
+        logger.error("%s" %ex)
+    finally:
+        lcd.turn_off()
         ser.close()
-    ser.close()
 
 
 def main():
