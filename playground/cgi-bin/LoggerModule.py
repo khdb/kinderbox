@@ -25,6 +25,8 @@ class Logger:
         # add the handlers to the logger
         self.logger.addHandler(fh)
         self.logger.addHandler(ch)
+        cmd = "sudo chown pi:pi %s" %fh
+        os.system(cmd)
 
     def debug(self, message):
         self.logger.debug(message)

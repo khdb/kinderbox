@@ -74,7 +74,7 @@ def reading_rfid():
             rawData = []
             decimalData = ""
             isRead = False
-            buf = ser.read(100)
+            buf = ser.read(50)
             if len(buf) > 0:
                 for d in buf:
                     if d == '\x02':

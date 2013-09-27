@@ -122,10 +122,8 @@ class Kinderbox4Kids:
                 if (current_ms - display_lcd_ms) > 1:
                     display_lcd_ms = current_ms
                     self.lcd.scroll_to_left()
-        except IOError:
-            self.logger.error('An error occured trying to read the file.')
-            os.system("mpc stop")
         except Exception, err:
+            print "Exception: %s" %err
             self.logger.exception("An exception occured: %s" %err)
         finally:
             self.sensor.close()

@@ -52,7 +52,7 @@ class Sensor:
         rawData = []
         decimalData = ""
         isRead = False
-        buf = self.ser.read(100)
+        buf = self.ser.read(50)
         if len(buf) > 0:
             for d in buf:
                 if d == '\x02':
