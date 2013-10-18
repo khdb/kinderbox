@@ -1,0 +1,45 @@
+  <div class="alert alert-info has-spinner" ng-show="isloading">
+        <i class="icon-info-sign icon-2x"></i>  Loading playlist, please wait
+        <i class="icon-spinner icon-spin icon-2x"></i>  
+  </div>
+
+<!-- 
+<div class="well">
+dynamic input of search field:
+
+ <p>
+  <button class="btn btn-info" type="button" ng-click="rfidCard = '' ">Show all</button>
+  <button class="btn btn-default" type="button" ng-click="testMatchAlbum(12)">match album with rfid 12</button>
+</p>
+
+</div>
+ -->
+
+
+
+<div class="alert" ng-hide="isloading">
+  <div>
+      
+        <input type="text" class="span3" ng-model="rfidCard" placeholder="scanning for RFID card ... " />
+        <button type="button" class="btn btn-info" ng-click="rfidCard = '' ">Show all </button>
+   
+  </div>
+  <div>
+      <p> 
+     Ready for scan, please keep your RFID tag close to the kinderbox so it can read it.
+      </p>
+  </div>
+</div>
+
+<h3>matching for: {{rfidCard}}</h3>
+
+ <ul class="thumbnails">
+  <li class="span3" ng-repeat="thing in musicAlbums | filter:rfidCard">
+  	<div class="thumbnail" class="clearfix" style="height: 200px;">
+    	<h5> {{thing.name}}  </h5>
+      	<img ng-init="" ng-src="http://10.0.0.47/images/{{thing.barcodeid}}/cover.jpg" class="img-polaroid" style="width: 	100px;"  alt="" />
+    	<p class="pagination pagination-centered"> <span class="label label-inverse"> {{thing.rfid}}  </span> </p>
+    </div>
+  </li>
+  
+</ul>

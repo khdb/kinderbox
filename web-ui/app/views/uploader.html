@@ -1,0 +1,47 @@
+<!-- uploader.html template -->
+
+<div class="well well-small" ng-show="filename">
+	 <i class="icon-file icon  icon-2x"></i> 
+	<span class="label label-inverse">  {{filename}} | {{filesize}} MB </span>
+</div>
+<div class="uploader">
+
+  <fieldset>
+    <legend> Upload a new album to your Kinderbox </legend>
+    <label>  </label>
+   <!--  <input type="text" placeholder="Click here…"> -->
+    <input class="" type="file" placeholder="Click here…" name="uploader2" 
+		 onchange="angular.element(this).scope().sendFile(this);"/>
+
+   	<!-- input field, used to open the real input[type=file]  -->
+<!--    	
+	<div class="fake-uploader">
+		<label for="uploader"></label>
+		<input type="text" readonly="readonly" ng-model="avatar"/>
+	</div> -->
+
+	<!-- progress bar -->
+	<div class="progress  progress-striped" ng-show="progress!=0">
+		<div class="bar" style="width:{{progress}}%;"></div>
+		<div class="bar bar-warning" style="width: 20%;"></div>
+	</div>
+
+	<div class="alert alert-info has-spinner" ng-show="progress==100">
+        <i class="icon-info-sign icon-2x"></i>  Please wait until the file is stored on the KinderBox.
+        <i class="icon-spinner icon-spin icon-2x"></i>  
+	</div>
+
+	<div class="alert alert-success" ng-show="uploadDone">
+        <i class="icon-ok icon-2x"></i>  Well done! You successfully uploaded a new album.
+	</div>
+
+  </fieldset>
+
+</div>
+
+<!-- 
+<i class="icon-spinner icon-spin icon-2x"></i> Spinner icon when loading content...
+<i class="icon-3x icon-camera-retro"></i> icon-camera-retro
+<i class="icon-spin icon-refresh"></i>  -->
+
+

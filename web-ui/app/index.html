@@ -1,0 +1,218 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+        <!-- build:css(.tmp) styles/main.css -->
+        <link rel="stylesheet" href="styles/bootstrap.css">
+        <link rel="stylesheet" href="styles/main.css">
+        <!-- Use this method to get the default Font Awesome CSS with the default Bootstrap CSS.
+        Copy the font-awesome directory into your project.
+        In the <head> of your html, reference the location to your font-awesome.min.css. -->
+        <link rel="stylesheet" href="styles/font-awesome.min.css">
+        <!-- endbuild -->
+
+      <style>
+        body {
+          padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+        }
+
+        .mycss-animation {
+          -webkit-transition:1s linear all;
+          -moz-transition:1s linear all;
+          -o-transition:1s linear all;
+          transition:1s linear all; /* future proof */
+
+          background:red;
+        }
+          .mycss-animation.mycss-animation-active {
+          background:blue;
+        }
+
+        .fade-hide, .fade-show {
+           -webkit-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+           -moz-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+           -o-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+           transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+        }
+
+         .fade-hide {
+           opacity:1;
+         }
+         .fade-hide.fade-hide-active {
+           opacity:0;
+         }
+
+         .fade-show {
+           opacity:0;
+         }
+         .fade-show.fade-show-active {
+           opacity:1;
+         }
+/*
+         ul
+          {
+            list-style-type: none;
+          }*/
+        
+
+      </style>
+
+</head>
+  <body ng-app="kinderboxApp">
+    <!--[if lt IE 7]>
+      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    <!--[if lt IE 9]>
+      <script src="bower_components/es5-shim/es5-shim.js"></script>
+      <script src="bower_components/json3/lib/json3.min.js"></script>
+    <![endif]-->
+
+<!-- 
+    <script type="text/ng-template" id="rfid-search-results.html">
+
+      <div class="row well"> 
+         <h4> {{ title }}  </h4>
+
+        <img ng-if="showImg()" src="http://10.0.0.47/images/{{barcode}}/cover.jpg" class="img-polaroid" style="width: 100px;">
+
+        <span class="alert alert-success"> Barcode:  {{ barcode }} </span>
+        <span class="alert alert-info"> RFID: {{ rfid }} </span>
+        <span class="alert alert-info"> cover: {{ cover }} </span>
+        
+      </div>
+
+    </script>
+
+ -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="#"> KinderBox [Manage] </a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li><a href="#/"> <i class="icon-home"></i> Dashboard </a> </li>
+              <li><a href="#/albums"> Show Playlists </a> </li>
+              <li><a href="#/new-playlist"> Add new Playlists</a> </li>
+              <li><a href="#/match-rfid"> Matching RFIDs</a> </li>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"> Manage RFID <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  <li class="nav-header"><a href="#/new-rfid"> Scan new RFID cards </a></li>
+                  <li class="divider"></li>
+                  <li><a href="#/rfid-status"> RFID info </a></li>
+                <!--   <li><a href="#"> RFIDs already in uses  </a></li> -->
+               
+                </ul>
+              </li>
+              <li><a href="#/help">  Help  <i class="icon-question-sign"> </i>  </a>  </li>   
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+   <!--  <br/><br/> -->
+
+
+      <!-- Add your site or application content here -->
+    <div class="container" ng-view=""></div>
+
+
+
+
+
+
+
+    <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
+
+<!--     
+     <script>
+       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+       })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+       ga('create', 'UA-XXXXX-X');
+       ga('send', 'pageview');
+    </script>
+
+ -->
+<!-- 
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script> 
+        <script src="http://malsup.github.com/jquery.form.js"></script> 
+ -->
+        <script src="http://10.0.0.47:9292/faye.js"></script>
+        
+<!-- 
+        <script src="bower_components/jquery/jquery.js"></script>
+
+     -->
+        <script src="bower_components/angular/angular.js"></script>
+        <script src="bower_components/underscore/underscore-min.js"></script>
+        <script src="bower_components/4kinderbox/jquery.js"></script>
+        <script src="bower_components/4kinderbox/jquery.form.js"></script>
+
+
+        <!-- build:js scripts/plugins.js -->
+        <script src="bower_components/bootstrap-sass/js/bootstrap-affix.js"></script>
+        <script src="bower_components/bootstrap-sass/js/bootstrap-alert.js"></script>
+        <script src="bower_components/bootstrap-sass/js/bootstrap-dropdown.js"></script>
+        <script src="bower_components/bootstrap-sass/js/bootstrap-tooltip.js"></script>
+        <script src="bower_components/bootstrap-sass/js/bootstrap-modal.js"></script>
+        <script src="bower_components/bootstrap-sass/js/bootstrap-transition.js"></script>
+        <script src="bower_components/bootstrap-sass/js/bootstrap-button.js"></script>
+        <script src="bower_components/bootstrap-sass/js/bootstrap-popover.js"></script>
+        <script src="bower_components/bootstrap-sass/js/bootstrap-typeahead.js"></script>
+        <script src="bower_components/bootstrap-sass/js/bootstrap-carousel.js"></script>
+        <script src="bower_components/bootstrap-sass/js/bootstrap-scrollspy.js"></script>
+        <script src="bower_components/bootstrap-sass/js/bootstrap-collapse.js"></script>
+        <script src="bower_components/bootstrap-sass/js/bootstrap-tab.js"></script>
+        <!-- endbuild -->
+
+        <!-- build:js scripts/modules.js -->
+        <script src="bower_components/angular-resource/angular-resource.js"></script>
+        <script src="bower_components/angular-cookies/angular-cookies.js"></script>
+        <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+        <!-- endbuild -->
+
+        <!-- build:js({.tmp,app}) scripts/scripts.js -->
+        <script src="scripts/app.js"></script>
+        <script src="scripts/controllers/main.js"></script>
+        <!-- endbuild -->
+
+
+
+ 
+    <div id="footer">
+      <div class="container">
+        <p class="muted credit"> © Copyright 2013 - The Kinderbox guys  <a href="#">Khoa Do</a> and <a href="#"> Huy Mai</a>.</p>
+      </div>
+    </div>
+
+<!-- <footer class="footer itemContainer">
+    <div class="container">
+        <div class="row">
+            <div class="span12">
+                
+            </div>
+        </div>
+    </div>
+</footer> -->
+
+</body>
+</html>

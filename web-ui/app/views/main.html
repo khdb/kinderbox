@@ -1,0 +1,73 @@
+<h3> Dashboard </h3>
+
+<div class="row">
+
+	<div class="span7">
+		<div class="alert">
+		 <h4> To do list</h4>	
+		 <hr>
+
+		   <ul>
+		      <li ng-repeat="todo in todos">{{todo}}</li>
+		  </ul>
+
+		</div>
+	</div>
+
+	<div class="span5">
+		
+		<div class="alert alert-success">
+			 <p>
+  				<button class="btn btn-primary" type="button" ng-click="enableKinderbox()">Enable Kinderbox</button>
+			</p>
+			if the KinderBox is working in playback mode, you can activelly enable it here.
+		</div>
+
+		<div class="alert alert-info">
+		 <h4> My Kinderbox status</h4>	
+		 <br>
+		   <div class="well">
+		   <ul style="list-style: none;">
+		      <li> <h5> Playable music album:  <span class="badge badge-success"> {{ status.playable }} </span>  </h5></li>
+		      <li> <h5> Waiting for RFID card mapping: <span class="badge"> {{ status.notplayable }} </span> </h5> </li>
+		      <li> <h5> Used RFID cards: <span class="badge badge-inverse"> {{ rfidStatus.usedRFID }} </span> </h5> </li>
+		      <li> <h5> Free RFID cards: <span class="badge badge-info"> {{ rfidStatus.freeRFID }} </span> </h5> </li>
+		     <!--  
+		      <li> <h5> Requesting new RIFD cards: <span class="badge badge-warning"> {{ needNewRfid }} </span> </h5> </li> -->
+		  </ul>
+          </div>
+          <div class="well well-small">
+         <!--  	<h5> Explanation: </h5> -->
+
+          	<ul>
+          		<li>
+             <strong> Playable music album </strong> 
+             <p> Music album that is associated with a RFID card, this album can be loaded for playback if the correct RFID card is usded. </p>
+                </li>
+
+                <li>
+                	<strong> Waiting for RFID card mapping </strong>
+                	<p> Music album which are uploaded and added to the Kinderbox but has no RFID card associaed with yet.</p>
+                </li>
+
+                <li>
+                	<strong> Used RFID cards </strong>
+                	<p> RFID cards which are registered in the Kinderbox and already associated with a RFID card.</p>	
+                </li>	
+                <li>
+                	<strong> Free RFID cards </strong>
+                	<p> RFID cards which are registered in the Kinderbox but not yet used, it therefore as no association with any music album, it can be used for future album uploads.</p>
+                </li>
+
+
+            </ul>    
+
+          </div>	
+		</div>
+	</div>
+
+</div>
+
+
+
+

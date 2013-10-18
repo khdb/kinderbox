@@ -1,0 +1,37 @@
+
+
+<div id="duplicated" class="alert" ng-show="duplicateRFID" data-ng-animate="'fade'">
+	 <i class="icon-warning-sign"></i> 
+	 {{rfid}} 
+</div>
+
+
+
+  <h3> Add new RFID cards </h3>
+
+<div class="well well-small">
+	
+
+  <p>Now scanning for new RIFD cards .... </p>
+  
+
+  <div class="alert alert-success" ng-repeat="id in messages">
+        <i class="icon-ok"></i> {{id}} has been added successfuly.
+  </div>
+
+<!--    <div class="alert alert-success" ng-repeat="id in messages">
+        <i class="icon-ok"></i> {{id}}
+  </div> -->
+
+
+  <br/>
+  <hr/>
+
+</div>
+
+
+
+    
+
+     
+
